@@ -39,6 +39,12 @@
 #include"microps.h"
 
 
+struct device {
+	int fd;
+};
+
+
+
 static const struct rte_eth_conf port_conf_default = {
 	.rxmode = { .max_rx_pkt_len = ETHER_MAX_LEN }
 };
@@ -151,7 +157,21 @@ void dpdk_init(int argc, char **argv){
 
 
 
+device_t *device_open (const char *name) {
+	device_t *device;
+	if ((device = malloc(sizeof(*device))) == NULL) {
+		perror("malloc");
+		exit(1);
+	}
+	return device;
+}
 
+void device_close (device_t *device) {
+    //if (device->fd != -1) {
+    //    close(device->fd);
+    //}
+    free(device);
+}
 
 
 

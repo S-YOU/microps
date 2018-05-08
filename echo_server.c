@@ -25,6 +25,7 @@ struct microps_param param = {
 
 int
 main (int argc, char *argv[]) {
+	dpdk_init(argc, argv);
     int soc = -1, acc;
     uint8_t buf[65536];
     ssize_t len;

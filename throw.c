@@ -25,6 +25,7 @@ struct microps_param param = {
 
 int
 main (int argc, char *argv[]) {
+	dpdk_init(argc, argv);
     int soc = -1, acc;
     uint8_t buf[65536];
     ssize_t len;
@@ -45,12 +46,13 @@ main (int argc, char *argv[]) {
         goto ERROR;
     }
 fprintf(stderr, "accept success, soc=%d, acc=%d\n", soc, acc);
+	sprintf(buf, "test");
     while (1) {
-        len = tcp_api_recv(acc, buf, sizeof(buf));
-        if (len <= 0) {
-            break;
-        }
-        hexdump(stderr, buf, len);
+        //len = tcp_api_recv(acc, buf, sizeof(buf));
+        //if (len <= 0) {
+        //    break;
+        //}
+        //hexdump(stderr, buf, len);
         tcp_api_send(acc, buf, len);
     }
     tcp_api_close(acc);
