@@ -39,12 +39,12 @@ RTE_TARGET ?= x86_64-native-linuxapp-gcc
 include $(RTE_SDK)/mk/rte.vars.mk
 
 # binary name
-APP = echo_server
+APP = throw
 
 # all source are stored in SRCS-y
-SRCS-y := echo_server.c microps.c tcp.c udp.c icmp.c ip.c arp.c ethernet.c util.c dhcp.c dpdk.c
+SRCS-y := throw.c microps.c tcp.c udp.c icmp.c ip.c arp.c ethernet.c util.c dhcp.c dpdk.c
 
-CFLAGS += -O3 -lpthread -pthread
+CFLAGS += -g -O3 -lpthread -pthread 
 #CFLAGS += $(WERROR_FLAGS)
 
 include $(RTE_SDK)/mk/rte.extapp.mk

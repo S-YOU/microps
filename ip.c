@@ -161,12 +161,12 @@ ip_route_table_init() {
 }
 
 static int
-ip_route_lookup (const ip_addr_t *dst, ip_addr_t *nexthop) {
+ip_route_lookup (const ip_addr_t *dst, ip_addr_t *nexthop) { 
     struct ip_route *route, *candidate = NULL;
 
-    IP_ROUTE_TABLE_FOREACH (route) {
-        if (route->used && (*dst & route->netmask) == route->network) {
-            if (!candidate || ntoh32(candidate->netmask) < ntoh32(route->netmask)) {
+    IP_ROUTE_TABLE_FOREACH (route) { //for route_table
+        if (route->used && (*dst & route->netmask) == route->network) {//comform used and rightfulness
+            if (!candidate || ntoh32(candidate->netmask) < ntoh32(route->netmask)) {//longest match
                 candidate = route;
             }
         }
@@ -413,6 +413,13 @@ ip_init (const char *addr, const char *netmask, const char *gateway, uint8_t rec
             return -1;
         }
     }
+#if 0
+		/* test route */
+		if (ip_route_add("10.0.0.5", "255.255.255.0", "10.0.0.1") == -1){
+			return -1;
+		}
+#endif
+
     
     if (!reconfigure) {
         ethernet_add_protocol(ETHERNET_TYPE_IP, ip_input);

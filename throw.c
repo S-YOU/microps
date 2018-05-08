@@ -37,14 +37,22 @@ main (int argc, char *argv[]) {
     if (soc == -1) {
         goto ERROR;
     }
-    if (tcp_api_bind(soc, hton16(7)) == -1) {
-        goto ERROR;
-    }
-    tcp_api_listen(soc);
-    acc = tcp_api_accept(soc);
-    if (acc == -1) {
-        goto ERROR;
-    }
+		
+		ip_addr_t addr = 0x0a000001;
+		uint16_t port = 80;
+		if (tcp_api_connect(soc, &addr, port) == -1){
+			fprintf(stdout, "connect faild\n");
+			exit(1);
+		}
+
+    //if (tcp_api_bind(soc, hton16(7)) == -1) {
+    //    goto ERROR;
+    //}
+    //tcp_api_listen(soc);
+    //acc = tcp_api_accept(soc);
+    //if (acc == -1) {
+    //    goto ERROR;
+    //}
 fprintf(stderr, "accept success, soc=%d, acc=%d\n", soc, acc);
 	sprintf(buf, "test");
     while (1) {

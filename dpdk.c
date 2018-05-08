@@ -158,6 +158,7 @@ void dpdk_init(int argc, char **argv){
 
 
 device_t *device_open (const char *name) {
+	printf("head of device_open\n");
 	device_t *device;
 	if ((device = malloc(sizeof(*device))) == NULL) {
 		perror("malloc");
@@ -209,6 +210,8 @@ ssize_t
 device_output (device_t *device, const uint8_t *buffer, size_t length) {
  //return write(device->fd, buffer, length);
 
+ printf("head of device_output\n");
+
 	const uint16_t nb_ports = rte_eth_dev_count();
 	uint16_t port;
 
@@ -232,6 +235,7 @@ device_output (device_t *device, const uint8_t *buffer, size_t length) {
 	/* Send burst of TX packets */
 	//struct rte_mbuf *bufs[BURST_SIZE];
 
-	return rte_eth_tx_burst(port, 0, buffer, 1);
+	printf("before tx_burst\n");
 
+	return rte_eth_tx_burst(port, 0, buffer, 1);
 }

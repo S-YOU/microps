@@ -12,7 +12,7 @@
 
 #include<rte_hexdump.h>
 #include <rte_ether.h>
-
+#include"microps.h"
 
 
 
@@ -24,5 +24,15 @@
 #define NUM_MBUFS 8191
 #define MBUF_CACHE_SIZE 250
 #define BURST_SIZE 32
+
+
+
+/*****/
+static inline int port_init(uint16_t port, struct rte_mempool *mbuf_pool);
+void dpdk_init(int argc, char **argv);
+device_t *device_open(const char *name);
+void device_input(device_t *device, void (*callback)(uint8_t *, size_t), int timeout);
+ssize_t device_output(device_t *device, const uint8_t *buffer, size_t length);
+
 
 #endif
