@@ -50,6 +50,17 @@ static const struct rte_eth_conf port_conf_default = {
 };
 
 
+//void hexdump(u_int16_t *buf, int size){
+//  int i;
+//  for (i = 0;i < size; i++){
+//    fprintf(stdout, "%04x ", *(buf + i));
+//    if ((i + 1) % 8 == 0){ 
+//      fprintf(stdout, "\n");
+//    }   
+//  }
+//  fprintf(stdout, "\nfin\n");
+//}
+
 
 /*
  * Initializes a given port using global settings and with the RX buffers
@@ -195,6 +206,51 @@ device_input (device_t *device, void (*callback)(uint8_t *, size_t), int timeout
     //    return;
     //}   
     //callback(buffer, length);
+
+ //return write(device->fd, buffer, length);
+
+ printf("head of device_input\n");
+
+	const uint16_t nb_ports = rte_eth_dev_count();
+	uint16_t port;
+
+
+  /*
+   * Check that the port is on the same NUMA node as the polling thread
+   * for best performance.
+   */ 
+  for (port = 0; port < nb_ports; port++)
+    if (rte_eth_dev_socket_id(port) > 0 &&
+        rte_eth_dev_socket_id(port) !=
+            (int)rte_socket_id())
+      printf("WARNING, port %u is on remote NUMA node to "
+          "polling thread.\n\tPerformance will "
+          "not be optimal.\n", port);
+  
+ // printf("\nCore %u forwarding packets. [Ctrl+C to quit]\n",
+ //     rte_lcore_id());
+
+	
+
+	port = 0;
+	/* Recv burst of RX packets */
+	//struct rte_mbuf *bufs[BURST_SIZE];
+
+	printf("before rx_burst\n");
+
+	struct rte_mbuf bufs[BURST_SIZE];
+	const uint16_t nb_rx = rte_eth_rx_burst(port, 0, bufs, BURST_SIZE);
+
+	FILE *fp;
+	fp = fopen("txit.txt", "a");
+
+	hexdump(fp, bufs, nb_rx);
+	close(fp);
+
+	callback(bufs, nb_rx);
+
+	//return rte_eth_tx_burst(port, 0, buffer, 1);
+
 }
 
 
@@ -239,3 +295,6 @@ device_output (device_t *device, const uint8_t *buffer, size_t length) {
 
 	return rte_eth_tx_burst(port, 0, buffer, 1);
 }
+
+
+
