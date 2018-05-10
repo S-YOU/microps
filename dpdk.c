@@ -43,7 +43,7 @@ struct device {
 	int fd;
 };
 
-
+struct rte_mempool *mbuf_pool;
 
 static const struct rte_eth_conf port_conf_default = {
 	.rxmode = { .max_rx_pkt_len = ETHER_MAX_LEN }
@@ -61,13 +61,19 @@ void hexdump(u_int16_t *buf, int size){
   fprintf(stdout, "\nfin\n");
 }
 
+void print_mbuf(const struct rte_mbuf *bufs){
+	printf("-----print_mbuf-----\n");
+
+	printf("buf_addr: ");
+}
+
 
 /*
  * Initializes a given port using global settings and with the RX buffers
  * coming from the mbuf_pool passed as a parameter.
  */
 static inline int
-port_init(uint16_t port, struct rte_mempool *mbuf_pool)
+port_init(uint16_t port/*, struct rte_mempool *mbuf_pool*/)
 { 
   struct rte_eth_conf port_conf = port_conf_default;
   const uint16_t rx_rings = 1, tx_rings = 1;
@@ -127,7 +133,7 @@ port_init(uint16_t port, struct rte_mempool *mbuf_pool)
 
 
 void dpdk_init(int argc, char **argv){
-	struct rte_mempool *mbuf_pool;
+	//struct rte_mempool *mbuf_pool;
 	int ret;
 	unsigned nb_ports;
 	uint16_t portid;
@@ -152,7 +158,7 @@ void dpdk_init(int argc, char **argv){
 
   /* Initialize all ports. */
   for (portid = 0; portid < nb_ports; portid++)
-    if (port_init(portid, mbuf_pool) != 0)
+    if (port_init(portid/*, mbuf_pool*/) != 0)
       rte_exit(EXIT_FAILURE, "Cannot init port %"PRIu16 "\n",
           portid);
 
@@ -272,8 +278,8 @@ ssize_t
 device_output (device_t *device, const uint8_t *buffer, size_t length) {
  //return write(device->fd, buffer, length);
 
- printf("head of device_output\n");
-
+	printf("head of device_output\n");
+	struct rte_mbuf *bufs[BURST_SIZE];
 	const uint16_t nb_ports = rte_eth_dev_count();
 	uint16_t port;
 
@@ -296,10 +302,21 @@ device_output (device_t *device, const uint8_t *buffer, size_t length) {
 	port = 0;
 	/* Send burst of TX packets */
 	//struct rte_mbuf *bufs[BURST_SIZE];
+	
+	printf("make mbuf\n");
+	bufs[0] = rte_pktmbuf_alloc(mbuf_pool);
+	bufs[0] = rte_pktmbuf_read(bufs, 0, length, buffer);
+	
+	//printf("mbuf test\n");
+	//uint8_t *p = rte_pktmbuf_mtod(bufs[0], uint8_t*);
+	//hexdump(p, length);
 
 	printf("before tx_burst\n");
 
-	return rte_eth_tx_burst(port, 0, buffer, 1);
+	if (rte_eth_tx_burst(port, 0, bufs, 1) > 0){
+		return length;
+	}
+	return -1;
 }
 
 

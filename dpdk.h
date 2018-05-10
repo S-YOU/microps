@@ -28,7 +28,7 @@
 
 
 /*****/
-static inline int port_init(uint16_t port, struct rte_mempool *mbuf_pool);
+static inline int port_init(uint16_t port/*, struct rte_mempool *mbuf_pool*/);
 void dpdk_init(int argc, char **argv);
 device_t *device_open(const char *name);
 void device_input(device_t *device, void (*callback)(uint8_t *, size_t), int timeout);
