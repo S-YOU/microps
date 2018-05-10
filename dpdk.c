@@ -38,6 +38,9 @@
 #include"dpdk.h"
 #include"microps.h"
 
+//#include<net/ethernet.h>
+//#include<netinet/if_ether.h>
+
 
 struct device {
 	int fd;
@@ -64,7 +67,27 @@ void hexdump(u_int16_t *buf, int size){
 void print_mbuf(const struct rte_mbuf *bufs){
 	printf("-----print_mbuf-----\n");
 
-	printf("buf_addr: ");
+	//printf("rearm_data: %u\n", bufs->rearm_data);
+
+	printf("data_off: %u\n", bufs->data_off);
+	printf("refcnt: %u\n", bufs->refcnt);
+	printf("nb_segs: %u\n", bufs->nb_segs);
+	printf("port: %u\n", bufs->port);
+	printf("ol_flags: %u\n", bufs->ol_flags);
+	printf("packet_type: %u\n", bufs->packet_type);
+	printf("pkt_len: %u\n", bufs->pkt_len);
+	printf("data_len: %u\n", bufs->data_len);
+	printf("vlan_tci: %u\n", bufs->vlan_tci);
+	printf("rss: %u\n", bufs->hash.rss);
+	printf("vlan_tci_outer: %u\n", bufs->vlan_tci_outer);
+	printf("buf_len: %u\n", bufs->buf_len);
+	printf("timestamp: %u\n", bufs->timestamp);
+	printf("udata: %u\n", bufs->udata64);
+	printf("tx_offlead: %u\n", bufs->tx_offload);
+	printf("priv_size: %u\n", bufs->priv_size);
+	printf("timesync: %u\n", bufs->timesync);
+	printf("seqn: %u\n", bufs->seqn);
+	printf("--------------------\n");
 }
 
 
@@ -255,6 +278,7 @@ device_input (device_t *device, void (*callback)(uint8_t *, size_t), int timeout
 	//FILE *fp;
 	//fp = fopen("txit.txt", "a");
 	hexdump(p, size);
+	print_mbuf(bufs[i]);
 
 	//fprintf(fp, "%s\n", hexdump(bufs, nb_rx));
 	//close(fp);
@@ -303,13 +327,49 @@ device_output (device_t *device, const uint8_t *buffer, size_t length) {
 	/* Send burst of TX packets */
 	//struct rte_mbuf *bufs[BURST_SIZE];
 	
-	printf("make mbuf\n");
+	printf("rte_pktmbuf_alloc\n");
 	bufs[0] = rte_pktmbuf_alloc(mbuf_pool);
-	bufs[0] = rte_pktmbuf_read(bufs, 0, length, buffer);
+	print_mbuf(bufs[0]);
+	//bufs[0]->pkt_len = 60;
+	//bufs[0]->data_len = 60;
+	//print_mbuf(bufs[0]);
+
+	printf("strncpy\n");
+	uint8_t *p = rte_pktmbuf_append(bufs[0], length);
+	//uint8_t *p = rte_pktmbuf_mtod(bufs[0], uint8_t*);
+	strncpy(p, buffer, length);
+	
+	/******/
+	//struct ether_arp *pp = p + sizeof(struct ether_header);
+	//struct ether_arp *buffer_e += sizeof(struct ether_header);
+	//strncpy(pp->ea_hdr, buffer_e->ea_hdr, strlen(buffer->ea_hdr));
+	/******/
+
+	print_mbuf(bufs[0]);
+	printf("port\n");
+	bufs[0]->port = 0;
+	printf("packet_type\n");
+	bufs[0]->packet_type = 1;
+	print_mbuf(bufs[0]);
+	printf("len\n");
+	//printf("rte_pktmbuf_read\n");
+	//bufs[0] = rte_pktmbuf_read(bufs[0], 0, length, buffer);
+	////print_mbuf(bufs[0]);
+
+	//printf("rte_get_ptypte_name\n");
+	////bufs[0]->packet_type = (uint32_t)193;
+	//if (rte_get_ptype_name(bufs[0]->packet_type, buffer, length) == -1){
+	//	printf("rte_get_ptype_name\n");
+	//	exit(1);
+	//}
+
+	//print_mbuf(bufs[0]);
 	
 	//printf("mbuf test\n");
 	//uint8_t *p = rte_pktmbuf_mtod(bufs[0], uint8_t*);
-	//hexdump(p, length);
+	//hexdump(buffer, length);
+	printf("*****\n");
+	hexdump(p, length);
 
 	printf("before tx_burst\n");
 

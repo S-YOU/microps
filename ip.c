@@ -415,7 +415,7 @@ ip_init (const char *addr, const char *netmask, const char *gateway, uint8_t rec
     }
 #if 0
 		/* test route */
-		if (ip_route_add("10.0.0.5", "255.255.255.0", "10.0.0.1") == -1){
+		if (ip_route_add("10.0.0.0", "255.255.255.0", "10.0.0.1") == -1){
 			return -1;
 		}
 #endif
