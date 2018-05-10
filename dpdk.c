@@ -50,16 +50,16 @@ static const struct rte_eth_conf port_conf_default = {
 };
 
 
-//void hexdump(u_int16_t *buf, int size){
-//  int i;
-//  for (i = 0;i < size; i++){
-//    fprintf(stdout, "%04x ", *(buf + i));
-//    if ((i + 1) % 8 == 0){ 
-//      fprintf(stdout, "\n");
-//    }   
-//  }
-//  fprintf(stdout, "\nfin\n");
-//}
+void hexdump(u_int16_t *buf, int size){
+  int i;
+  for (i = 0;i < size; i++){
+    fprintf(stdout, "%04x ", *(buf + i));
+    if ((i + 1) % 8 == 0){ 
+      fprintf(stdout, "\n");
+    }   
+  }
+  fprintf(stdout, "\nfin\n");
+}
 
 
 /*
@@ -209,7 +209,7 @@ device_input (device_t *device, void (*callback)(uint8_t *, size_t), int timeout
 
  //return write(device->fd, buffer, length);
 
- printf("head of device_input\n");
+ //printf("head of device_input\n");
 
 	const uint16_t nb_ports = rte_eth_dev_count();
 	uint16_t port;
@@ -236,19 +236,25 @@ device_input (device_t *device, void (*callback)(uint8_t *, size_t), int timeout
 	/* Recv burst of RX packets */
 	//struct rte_mbuf *bufs[BURST_SIZE];
 
-	printf("before rx_burst\n");
+	//printf("before rx_burst\n");
 
-	struct rte_mbuf bufs[BURST_SIZE];
+	struct rte_mbuf *bufs[BURST_SIZE];
 	const uint16_t nb_rx = rte_eth_rx_burst(port, 0, bufs, BURST_SIZE);
 
-	FILE *fp;
-	fp = fopen("txit.txt", "a");
+	int i;
+	for (i = 0; i < nb_rx ; i++){
+		uint8_t *p = rte_pktmbuf_mtod(bufs[i], uint8_t*);
+		size_t size = rte_pktmbuf_pkt_len(bufs[i]);
+	
+	//FILE *fp;
+	//fp = fopen("txit.txt", "a");
+	hexdump(p, size);
 
-	hexdump(fp, bufs, nb_rx);
-	close(fp);
+	//fprintf(fp, "%s\n", hexdump(bufs, nb_rx));
+	//close(fp);
 
-	callback(bufs, nb_rx);
-
+	callback(p, size);
+	}
 	//return rte_eth_tx_burst(port, 0, buffer, 1);
 
 }
