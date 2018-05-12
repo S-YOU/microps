@@ -32,3 +32,17 @@ echo test:
 
  $ nc -u 192.168.0.100 7
 
+
+### microps ver dpdk-enable
+
+preparation:  
+ build DPDK and setup your machin to use DPDK. (please see http://dpdk.org/)
+
+build:  
+ $ make
+ 
+usage:  
+ $ sudo ./build/echo_server
+ 
+ping test:  
+ $ping 10.0.0.1
