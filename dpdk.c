@@ -330,14 +330,14 @@ device_output (device_t *device, const uint8_t *buffer, size_t length) {
 	printf("rte_pktmbuf_alloc\n");
 	bufs[0] = rte_pktmbuf_alloc(mbuf_pool);
 	print_mbuf(bufs[0]);
-	//bufs[0]->pkt_len = 60;
-	//bufs[0]->data_len = 60;
+	bufs[0]->pkt_len = length;
+	bufs[0]->data_len = length;
 	//print_mbuf(bufs[0]);
 
 	printf("strncpy\n");
-	uint8_t *p = rte_pktmbuf_append(bufs[0], length);
-	//uint8_t *p = rte_pktmbuf_mtod(bufs[0], uint8_t*);
-	strncpy(p, buffer, length);
+	//uint8_t *p = rte_pktmbuf_append(bufs[0], length);
+	uint8_t *p = rte_pktmbuf_mtod(bufs[0], uint8_t*);
+	memcpy(p, buffer, length);
 	
 	/******/
 	//struct ether_arp *pp = p + sizeof(struct ether_header);
