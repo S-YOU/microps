@@ -33,7 +33,7 @@ echo test:
  $ nc -u 192.168.0.100 7
 
 
-### microps ver dpdk-enable
+### microps ver dpdk-enable (branch:dpdk-enable)
 
 preparation:  
  build DPDK and setup your machin to use DPDK. (please see http://dpdk.org/)
