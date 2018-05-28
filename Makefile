@@ -2,15 +2,15 @@ PROGRAM = echo_server
 
 OBJECTS = microps.o tcp.o udp.o icmp.o ip.o arp.o ethernet.o util.o dhcp.o
 
-CFLAGS  := $(CFLAGS) -g -W -Wall -Wno-unused-parameter 
+CFLAGS  := $(CFLAGS) -O3 -fPIE -W -Wall -Wno-unused-parameter
 
 ifeq ($(shell uname),Linux)
-	OBJECTS := $(OBJECTS) pkt.o
+	MAIN_OBJECTS := $(OBJECTS) pkt.o
 	CFLAGS  := $(CFLAGS) -lpthread -pthread
 endif
 
 ifeq ($(shell uname),Darwin)
-	OBJECTS := $(OBJECTS) bpf.o
+	MAIN_OBJECTS := $(OBJECTS) bpf.o
 endif
 
 
@@ -21,11 +21,15 @@ endif
 
 all: $(PROGRAM)
 
-$(PROGRAM): % : %.o $(OBJECTS)
-	$(CC) $(CFLAGS) -o $@ $< $(OBJECTS) $(LDFLAGS)
+$(PROGRAM): % : %.o $(MAIN_OBJECTS)
+	$(CC) $(CFLAGS) -o $@ $< $(MAIN_OBJECTS) $(LDFLAGS)
 
 .c.o:
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -rf $(PROGRAM) $(PROGRAM:=.o) $(OBJECTS)
+	rm -rf $(PROGRAM) $(PROGRAM:=.o) $(MAIN_OBJECTS)
+
+lib: $(OBJECTS)
+	rm libmicrops.a
+	$(AR) rs libmicrops.a $(OBJECTS)
